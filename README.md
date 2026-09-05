@@ -232,9 +232,6 @@ WACCA_ROOT\
 │  ├─ WacconIO\
 │  │  └─ waccon_io.dll
 │  ├─ WACVR_WacconIO.json
-│  ├─ BACKEND_WACCON_IO.bat
-│  ├─ BACKEND_LEGACY_V020.bat
-│  └─ RESTORE_WACCON_IO.bat
 │
 └─ Game\
    └─ app\
