@@ -1,0 +1,17 @@
+Waccon-IO component included for the V0.2.1 integration lab
+==============================================================
+
+Upstream project: samnyan/Waccon-IO
+License: GNU GPL v3.0
+Upstream commit used: 475c89f2185940f5866de5d8939a7b9da57e55d0
+GitHub Actions run: 33898831076
+Artifact: waccon-io-win-x64 (artifact id 9946852132)
+Artifact ZIP digest reported by GitHub: sha256:7460986d71506beed4eb6dde4d13c2fa1f11d7f92911e2491e52dfb5f222ea1f
+waccon_io.dll SHA-256: 641a1bba4691476dea8622a6d68c34fa81b2cb945d924a283a8e981e092184ce
+
+Corresponding source:
+https://github.com/samnyan/Waccon-IO/tree/475c89f2185940f5866de5d8939a7b9da57e55d0
+
+The DLL is kept as a separate external component. WACVR's lab bridge only
+communicates with its documented WCON 1.1 shared-memory protocol.
+See LICENSE_GPL-3.0.txt for the license text.
