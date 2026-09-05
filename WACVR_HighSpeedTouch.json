@@ -1,0 +1,12 @@
+{
+  "Enabled": true,
+  "TouchPaddingMeters": 0.025,
+  "MinimumSweepMeters": 0.004,
+  "MinimumSweepSpeedMetersPerSecond": 0.35,
+  "HoldMilliseconds": 30.0,
+  "HapticsOnSweptHit": true,
+  "HapticRetriggerCooldownMilliseconds": 24.0,
+  "PhysicsHitBufferSize": 64,
+  "MaximumSingleFrameTrackingJumpMeters": 0.35,
+  "MaximumTrackingSpeedMetersPerSecond": 20.0
+}

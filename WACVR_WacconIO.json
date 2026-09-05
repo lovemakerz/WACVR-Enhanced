@@ -1,0 +1,15 @@
+{
+  "Enabled": true,
+  "MirrorButtons": true,
+  "MirrorTouch": true,
+  "MirrorLEDs": true,
+  "PollMilliseconds": 2,
+  "InputRefreshMilliseconds": 20,
+  "LeaseMilliseconds": 250,
+  "PatchSegatoolsForSession": true,
+  "RestoreSegatoolsOnExit": true,
+  "DisableLocalWinTouch": true,
+  "DisableLocalMouse": true,
+  "HideMouseCursor": true,
+  "WacconDebug": false
+}
