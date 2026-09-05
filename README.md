@@ -273,34 +273,6 @@ This closes the WACCA/WACVR session and restores the previous display configurat
 
 ---
 
-## Waccon backend
-
-The default backend is Waccon-IO.
-
-### Enable Waccon-IO
-
-```text
-BACKEND_WACCON_IO.bat
-```
-
-### Legacy fallback
-
-```text
-BACKEND_LEGACY_V020.bat
-```
-
-### Emergency restore
-
-If the game or launcher is forcibly terminated during a Waccon session:
-
-```text
-RESTORE_WACCON_IO.bat
-```
-
-This restores the previous Segatools / Waccon state.
-
----
-
 ## Configuration
 
 The standard WACVR configuration remains available through:
