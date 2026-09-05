@@ -1,100 +1,509 @@
 <div align="center">
-	<br/>
-	<p>
-    <img src="https://github.com/xiaopeng12138/WACVR/blob/main/PreviewImages/WACVR-LOGO.png?raw=true" width="546" />
-	</p>
-  <br/>
-  <p>
-    <h2><i>
-      an open source vr arcade simulator
-    </i></h2>
-  </p>
-  <p>
-    <a href="https://discord.gg/4aFV5QJWN5"><img src="https://img.shields.io/discord/1028269444780261436?color=5865F2&logo=discord&logoColor=white" alt="Discord server"/></a>
-    <a href="https://github.com/xiaopeng12138/WACVR/actions"><img src="https://github.com/xiaopeng12138/WACVR/actions/workflows/build.yml/badge.svg" alt="Build status"/></a>
+
+# WACVR Enhanced
+
+### Enhanced WACCA VR cabinet experience with integrated OpenXR launcher, improved VR touch tracking, Waccon-IO and native WACCA LED feedback
+
+**Unofficial fork of [xiaopeng12138/WACVR](https://github.com/xiaopeng12138/WACVR)**
+
 </div>
 
-## Preview
-<img src="https://github.com/xiaopeng12138/WACVR/blob/main/PreviewImages/Preview.png?raw=true" width="350" />
+---
 
-## About this project
-- Model is almost 1:1 to physical cabinet
-- Supports every game version
-- Supports native touch input via serial (com0com required)
-- Supports lights/LEDs (via hook)
+## About
+
+**WACVR Enhanced** is a fork of WACVR focused on making the complete WACCA VR experience more reliable, responsive and easier to launch.
+
+The project keeps the original near-1:1 WACCA cabinet simulation while adding a fully integrated launch flow, generic OpenXR support, significantly improved VR touch handling, Waccon-IO integration and real in-game LED feedback.
+
+The current stable reference is:
+
+> **WACVR Enhanced V0.2.3 — Waccon Clean Stable / Production**
+
+This version is considered **validated and stable**.
+
+---
+
+## Main features
+
+- Near-1:1 WACCA cabinet model
+- Generic **OpenXR** support
+- Integrated one-click launcher through `WACVR.exe`
+- Automatic WACCA launch and window focus
+- Automatic active OpenXR runtime detection
+- SteamVR is launched only when SteamVR is the active OpenXR runtime and is not already running
+- Improved high-speed VR touch detection
+- Raw high-frequency controller tracking
+- Swept touch path detection for fast hand movements
+- Hybrid touch handling with stable 60 Hz physics
+- Tracking hardening against invalid jumps and bad samples
 - Customizable haptic feedback
-- 4 customizable buttons
-- 3rd person and smoothed 1st person cameras
-- LIV avatars/mixed reality
+- **Waccon-IO** integration
+- Direct 240-cell WACCA touch input
+- Native TEST / SERVICE / COIN forwarding
+- Real WACCA LED output reproduced on the VR cabinet
+- 480 RGBA LED units supported
+- Clean Waccon session backup / restore
+- Legacy backend fallback
+- Global physical **Escape** key to safely close the complete session
+- Automatic display restoration
+- Watchdog for abnormal exits
+- Capture Desktop disabled by default for better performance
 
-## Supported platforms
-- All SteamVR devices (Index, HTC, Oculus, etc.)
-- All Oculus devices (Oculus Desktop App)
-> Tested on: Quest 2 through Oculus Link (Native and via SteamVR), ALVR and Virtual Desktop (via SteamVR).
+---
 
-## Repositories used
+## What changed compared with upstream WACVR
+
+### Integrated launcher
+
+Launch only:
+
+```text
+WACVR.exe
+```
+
+The launcher handles:
+
+```text
+WACVR.exe
+    ↓
+Display preparation
+    ↓
+OpenXR runtime detection
+    ↓
+WACVR_Core.exe
+    ↓
+WACCA launch
+    ↓
+Mercury-Win64-Shipping focus
+    ↓
+F1 / F2 / F3 IO handling
+    ↓
+Runtime monitoring
+    ↓
+Physical Escape
+    ↓
+Clean shutdown + display restoration
+```
+
+No separate launcher is required.
+
+---
+
+### Generic OpenXR
+
+The project does not force a specific VR runtime.
+
+It uses the currently active OpenXR runtime.
+
+Validated setup:
+
+- Meta Quest 3
+- Virtual Desktop
+- VirtualDesktopXR / VDXR
+- Windows 11
+- NVIDIA RTX 3090
+
+The implementation is not VDXR-specific and is intended to remain compatible with other OpenXR headsets.
+
+For devices such as Valve Index, SteamVR OpenXR can be used.
+
+---
+
+### Improved VR touch tracking
+
+Fast WACCA gameplay exposed limitations in the original touch path when the controller moved significantly between physics updates.
+
+WACVR Enhanced uses:
+
+- 60 Hz physics
+- high-frequency raw tracking
+- swept movement detection
+- hybrid trigger + sweep handling
+- controller tracking sanity checks
+- fallback to the physics proxy when raw tracking becomes invalid
+
+Validated touch parameters:
+
+```text
+TouchPaddingMeters                       = 0.025
+MinimumSweepMeters                       = 0.004
+MinimumSweepSpeedMetersPerSecond         = 0.35
+HoldMilliseconds                         = 30
+HapticRetriggerCooldownMilliseconds      = 24
+PhysicsHitBufferSize                     = 64
+MaximumSingleFrameTrackingJump           = 0.35 m
+MaximumTrackingSpeed                     = 20 m/s
+```
+
+The touch physics remains intentionally locked to **60 Hz**.
+
+---
+
+## Waccon-IO integration
+
+WACVR Enhanced uses **Waccon-IO** as the primary WACCA IO backend.
+
+Project:
+
+[Waccon-IO by samnyan](https://github.com/samnyan/Waccon-IO)
+
+Pinned integration reference:
+
+```text
+475c89f2185940f5866de5d8939a7b9da57e55d0
+```
+
+The integration communicates through:
+
+```text
+Local\WACCON_SHARED_BUFFER
+```
+
+### Input
+
+WACVR sends:
+
+- 240 touch cells
+- TEST
+- SERVICE
+- COIN
+
+Validated timing:
+
+```text
+PollMilliseconds          = 2
+InputRefreshMilliseconds  = 20
+LeaseMilliseconds         = 250
+```
+
+### LEDs
+
+WACCA's real LED output is read from Waccon-IO and mirrored back into the existing WACVR lighting system.
+
+Supported output:
+
+```text
+480 LED units
+RGBA
+```
+
+The mapping is direct 1:1.
+
+No LED index remapping or RGB channel swapping is applied.
+
+This allows the VR cabinet to reproduce the actual lighting animations generated by WACCA.
+
+---
+
+## Installation
+
+### Requirements
+
+- Windows
+- OpenXR-compatible VR headset
+- Active OpenXR runtime
+- WACCA installation already configured and working
+- Unity is **not** required when using a compiled release
+
+Game files are not included with this project.
+
+Please do not open issues asking where to obtain game data.
+
+---
+
+## Expected folder layout
+
+WACVR Enhanced automatically searches upward for:
+
+```text
+Game\app\bin\launch.bat
+```
+
+A typical installation may look like:
+
+```text
+WACCA_ROOT\
+│
+├─ WACVR\
+│  ├─ WACVR.exe
+│  ├─ WACVR_Core.exe
+│  ├─ WACVR_Core_Data\
+│  ├─ WacconIO\
+│  │  └─ waccon_io.dll
+│  ├─ WACVR_WacconIO.json
+│  ├─ BACKEND_WACCON_IO.bat
+│  ├─ BACKEND_LEGACY_V020.bat
+│  └─ RESTORE_WACCON_IO.bat
+│
+└─ Game\
+   └─ app\
+      └─ bin\
+         └─ launch.bat
+```
+
+The launcher does not depend on a hardcoded drive letter.
+
+---
+
+## Running
+
+Launch:
+
+```text
+WACVR.exe
+```
+
+The integrated launcher will:
+
+1. Detect the WACCA installation
+2. Save the current display configuration
+3. Prepare the required display mode
+4. Detect the active OpenXR runtime
+5. Start the VR core
+6. Prepare the Waccon-IO session
+7. Start WACCA
+8. Focus `Mercury-Win64-Shipping`
+9. Monitor the complete session
+
+To quit everything cleanly, press the physical:
+
+```text
+Escape
+```
+
+This closes the WACCA/WACVR session and restores the previous display configuration.
+
+---
+
+## Waccon backend
+
+The default backend is Waccon-IO.
+
+### Enable Waccon-IO
+
+```text
+BACKEND_WACCON_IO.bat
+```
+
+### Legacy fallback
+
+```text
+BACKEND_LEGACY_V020.bat
+```
+
+### Emergency restore
+
+If the game or launcher is forcibly terminated during a Waccon session:
+
+```text
+RESTORE_WACCON_IO.bat
+```
+
+This restores the previous Segatools / Waccon state.
+
+---
+
+## Configuration
+
+The standard WACVR configuration remains available through:
+
+```text
+config.json
+```
+
+Waccon-specific configuration is stored in:
+
+```text
+WACVR_WacconIO.json
+```
+
+The V0.2.3 production build automatically migrates older Waccon lab configuration when necessary.
+
+---
+
+## Recommended performance settings
+
+### Capture Desktop
+
+Keep:
+
+```text
+CaptureDesktop = false
+```
+
+at startup.
+
+Desktop capture was found to have a significant performance impact and can reduce rendering performance to around 30 FPS on some configurations.
+
+### Frame timing
+
+WACVR Enhanced uses:
+
+```text
+QualitySettings.vSyncCount = 0
+Application.targetFrameRate = -1
+```
+
+VR rendering therefore follows the OpenXR runtime refresh rate while touch physics remains independently fixed at 60 Hz.
+
+---
+
+## Controls
+
+The integrated launcher handles the arcade IO actions associated with:
+
+```text
+F1
+F2
+F3
+```
+
+### Exit
+
+```text
+Escape
+```
+
+is reserved for the global integrated shutdown.
+
+### F12
+
+Do not bind or use F12 inside WACVR Enhanced.
+
+F12 belonged to the older external launcher architecture and is intentionally not used by the current integrated version.
+
+---
+
+## Building from source
+
+### Required Unity version
+
+```text
+Unity 2021.3.22f1
+Revision b6c551784ba3
+```
+
+### Render pipeline
+
+```text
+Universal Render Pipeline 12.1.10
+```
+
+The project is based on upstream WACVR commit:
+
+```text
+c98216990436bd8932161d19bc3659719fb0e401
+```
+
+A short local build path is recommended, for example:
+
+```text
+C:\WVC23
+```
+
+On Windows, long Git paths may also require:
+
+```bash
+git config --global core.longpaths true
+```
+
+Do not include Unity-generated caches when redistributing source packages:
+
+```text
+Library
+Temp
+Logs
+obj
+UserSettings
+```
+
+---
+
+## Current stable release
+
+The current validated production reference is:
+
+```text
+WACVR Enhanced V0.2.3
+Waccon Clean Stable / Production
+```
+
+The V0.2.3 code path is considered stable and should not be retuned without a reproducible reason.
+
+In particular, avoid changing the validated touch, tracking, haptic and Waccon timing values simply to experiment with higher update rates.
+
+---
+
+## Known limitations
+
+- The project still depends on an already functional WACCA installation.
+- VR visual quality depends heavily on the original cabinet assets and textures.
+- Desktop capture is intentionally disabled by default because of its performance cost.
+- Waccon-IO temporarily modifies the active Segatools IO configuration during a session; the previous state is automatically restored on clean exit.
+- A forced system shutdown can prevent cleanup. `RESTORE_WACCON_IO.bat` is provided for this case.
+
+---
+
+## Compatibility
+
+Primary validated configuration:
+
+| Component | Validated setup |
+|---|---|
+| OS | Windows 11 |
+| Headset | Meta Quest 3 |
+| Streaming | Virtual Desktop |
+| OpenXR runtime | VirtualDesktopXR / VDXR |
+| GPU | NVIDIA RTX 3090 |
+| Unity | 2021.3.22f1 |
+
+The project is designed around generic OpenXR and should not be interpreted as VDXR-only.
+
+---
+
+## Credits
+
+WACVR Enhanced exists because of the work of the original WACVR project and the projects it builds upon.
+
+### Original project
+
+- [WACVR — xiaopeng12138](https://github.com/xiaopeng12138/WACVR)
+
+### Waccon integration
+
+- [Waccon-IO — samnyan](https://github.com/samnyan/Waccon-IO)
+
+### Projects credited by upstream WACVR
+
 - [Brokenithm-iOS](https://github.com/esterTion/Brokenithm-iOS)
 - [IL2cppStartProcess](https://github.com/josh4364/IL2cppStartProcess)
 - [MaiDXR](https://github.com/xiaopeng12138/MaiDXR)
 - [PrefabLightmapping](https://github.com/Ayfel/PrefabLightmapping)
 - [uWindowCapture](https://github.com/hecomi/uWindowCapture)
 
-## Disclaimers
-- This project is not-for-profit and some resources came from the Internet!
-- Although this repository is under the GPL-3.0 license, do not use any content of this repo in commercial/profitable scenarios without permission!
-- Please support your local arcade if you can!
-
-## How to use
-- Get the game somehow and make sure it's clean. (DO NOT ASK ANYTHING THAT IS DIRECTLY RELATED TO THE GAME ITSELF)
-- You have 2 ways to setup the game, Automated (recommended) or Manual.
-
-### Automated (recommended)
-Automated setup configures the game and downloads WACVR, xxxxtools, and other files for you.  
-Thank you to Glub Glub for releasing this!
-- Download [Glub Glub setup environment](https://github.com/ArcadeGlubGlub/GameSetup/raw/master/WACCAReverse-GlubGlub.7z) and extract it to a folder.
-- Then, follow the `README.txt` file inside to add and setup your game.
-- Add a server in `Game\app\bin\xxxxtools.ini` to connect to.
-- Once done, run `Launch` shortcut to start both WACVR and the game.
+Thank you to the original WACVR contributors and everyone who has worked on the surrounding WACCA community tooling.
 
 ---
 
-### Manual
-- Make sure the game properly and uses latest xxxxtools.
-- Download [the latest release version](https://github.com/xiaopeng12138/WACVR/releases) or [the nightly version of WACVR](https://nightly.link/xiaopeng12138/WACVR/workflows/build/main/artifact.zip).
-- You have 2 ways to connect touch to the game. Please only choose one of them:
+## License
 
-#### mercuryio
-  - You can find the ``mercuryio.dll`` inside the release file or you can download it [here](https://wacvr.xpengs.com/mercuryio.dll).
-  - Put ``mercuryio.dll`` into ``bin`` folder.
-  - Add ``[touch] enable=1`` to .ini file
-  - Add ``[mercuryio] path=mercuryio.dll`` to .ini file.
-  - Start the game and WACVR.
+This fork is based on WACVR and retains its GPL-3.0 licensing requirements.
 
-#### Serial (not recommended)
-  - Download and install [com0com](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/powersdr-iq/setup_com0com_W7_x64_signed.exe).
-  - Configure com0com to bind COM3 and COM5, COM4 and COM6.
-  - Enable the ``enable buffer overrun`` option in com0com on both ports of all pairs. Otherwise, your WACVR will crash after the logo.
-  - Add ``[touch] enable=0`` to .ini file
-  - Start WACVR first then start the game.
-  - If your touch is not working, try to somehow go to Test mode then exit Test mode.
+Waccon-IO is also distributed under GPL-3.0.
 
-- The lighting requires ``mercuryio.dll``. You must set it up to get the lights from the game. If you don't have the lights, please check if you are using the latest xxxxtools and if your LED hook works.
+When redistributing binaries derived from these projects, make the corresponding source and license information available as required by their licenses.
 
-## Configuration
-A ``config.json`` file is automatically created in WACVR's root directory on startup.
+Game files and proprietary game assets are **not** part of this repository.
 
-- You can change this file via the in-game config panel. Please take a step back: the controller pointer will automatically be disabled when the controller is too close to the cabinet.
-- You can change ``batFileLocation`` in ``config.json`` to the location of your start.bat file. The start.bat will automatically run when you start WACVR. 
-- Some options in ``config.json`` are only the index of the dropdown in the panel.
-- You can use the pointer to point the 3rd-person camera and move it to the position you want it to be.
+---
 
-## Building guide
-- Current Unity version: 2021.3.12f1
-- for mercuryio, just replace files in mercuryio folder with files in this repo.
+## Disclaimer
 
-## Known issues
-- Display white screen issue
-	- **Solution:** Set game priority in the task manager to real-time may solve this issue. But the best way is just by capturing the entire screen.
+This is an unofficial community project.
 
-Huge thanks to everyone that helped with this project!
-If you want to add any features or change anything, please commit a pull request. I will accept it as soon as possible!
+It is not affiliated with or endorsed by SEGA, Marvelous, the original WACCA developers, or any commercial arcade operator.
+
+No game data is provided.
+
+Please support official arcade releases and local arcades where available.
